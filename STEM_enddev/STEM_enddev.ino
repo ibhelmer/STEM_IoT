@@ -28,6 +28,7 @@
 // Constants
 // IoT Device
 // Subscription and publish channel
+// Change the deviceid to match the end device
 #define      DEVID     "esp99"
 #define      DEVCLIENT "esp99Client"
 #define      LED1SUB   "esp99/Led1"
@@ -63,11 +64,11 @@ int led1Pin = D0;                             // For some reason D1 don't work
 int led2Pin = D2;                             // So D1 is ormitted in the assignment
 int led3Pin = D3;
 
-// Switch
+// Switch (Push buttom)
 int sw1Pin = D7;
 int sw2Pin = D9;
 
-// Analog
+// Analog input
 int an0Pin = A0;
 
 // Objects 
@@ -77,11 +78,14 @@ DFRobot_RGBLCD1602 lcd(/*lcdCols*/16,/*lcdRows*/2);   // 16 characters and 2 lin
 DHT dht(DHTPIN, DHTTYPE);                             // DHT temperatur and humidity sensor
 Adafruit_NeoPixel RGB_Strip = Adafruit_NeoPixel(NUM_LED, PIN_LED, NEO_GRB + NEO_KHZ800);  // NeoPixel LED
 
+// Defining mutex for excluding code from preemptive task switching 
 portMUX_TYPE taskMux = portMUX_INITIALIZER_UNLOCKED; 
 
 void setup()
 {
+    // Setup serial port for debugging and data exchange
     Serial.begin(115200);
+    // Init RGB display
     lcd.init();
     // Setup ESP's Pin's
     pinMode(led1Pin, OUTPUT); digitalWrite(led1Pin, LOW);
@@ -107,6 +111,7 @@ void setup()
       NULL,
       CONFIG_ARDUINO_RUNNING_CORE
     );
+    // Setting up messurement task
     xTaskCreatePinnedToCore(
       measurement,
       "Measurement task",
@@ -116,6 +121,7 @@ void setup()
       NULL,
       CONFIG_ARDUINO_RUNNING_CORE
     );
+    // Setting up task for scanning pushbuttom
     xTaskCreatePinnedToCore(
       keyscan,
       "Key scanning task",
@@ -127,7 +133,7 @@ void setup()
     );     
     
 }
-
+// Check wifi connection
 void keepWiFiAlive(void * parameters){
   for(;;){
     if(WiFi.status() == WL_CONNECTED){
