@@ -51,7 +51,7 @@
 #define  WIFI_TIMEOUT_MS  20000
 
 // MQTT Broker address and port
-const char * mqtt_server = "192.168.1.45";   // IP address of MQTT broker
+const char * mqtt_server = "mqtt.sof60.dk";   // IP address of MQTT broker
 const uint16_t mqtt_port = 1883;              // TCP port used by the MQTT broker
 
 // LCD back light color
